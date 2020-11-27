@@ -86,7 +86,6 @@ namespace MyTypeRacer {
 	private: int int_wordProgress; // Integer zum Zaehlen des Wortfortschrittes
 	private: int int_timeSpentSec; // Integer zum Zaehlen der gebrauchten Zeit
 	private: int int_keyStrokes; // Ermittelt die Anzahl der Tastenanschlaege pro Minute
-	private: long long ll_timerCalcValuesTickCounter; // Hilfszaehler um die Tickrate von TimerCalcValues zu verwalten
 	private: bool bool_ErrorBit; // Prueft ob Fehler aufgetreten ist und wird bereinigt wenn kein Fehler mehr vorliegt
 	private: int int_Errors; // Integer zum Zaehlen der eingegebenen Fehler
 	private: String^ string_CurrentText;  // Der gesamte aktuelle Text
@@ -240,6 +239,7 @@ namespace MyTypeRacer {
 			this->textBox_Input->Size = System::Drawing::Size(460, 30);
 			this->textBox_Input->TabIndex = 0;
 			this->textBox_Input->TextChanged += gcnew System::EventHandler(this, &Hauptfenster::textBox_Input_TextChanged);
+			this->textBox_Input->KeyPress += gcnew System::Windows::Forms::KeyPressEventHandler(this, &Hauptfenster::textBox_Input_KeyPress);
 			// 
 			// richTextBox_CurrentText
 			// 
@@ -310,7 +310,7 @@ namespace MyTypeRacer {
 			this->label_Time->AutoSize = true;
 			this->label_Time->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
-			this->label_Time->Location = System::Drawing::Point(120, 8);
+			this->label_Time->Location = System::Drawing::Point(115, 8);
 			this->label_Time->Name = L"label_Time";
 			this->label_Time->Size = System::Drawing::Size(18, 20);
 			this->label_Time->TabIndex = 3;
@@ -345,7 +345,7 @@ namespace MyTypeRacer {
 			this->label_Words->AutoSize = true;
 			this->label_Words->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
-			this->label_Words->Location = System::Drawing::Point(120, 28);
+			this->label_Words->Location = System::Drawing::Point(115, 28);
 			this->label_Words->Name = L"label_Words";
 			this->label_Words->Size = System::Drawing::Size(18, 20);
 			this->label_Words->TabIndex = 14;
@@ -379,7 +379,7 @@ namespace MyTypeRacer {
 			this->label_WPM->AutoSize = true;
 			this->label_WPM->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
-			this->label_WPM->Location = System::Drawing::Point(120, 48);
+			this->label_WPM->Location = System::Drawing::Point(115, 48);
 			this->label_WPM->Name = L"label_WPM";
 			this->label_WPM->Size = System::Drawing::Size(18, 20);
 			this->label_WPM->TabIndex = 4;
@@ -473,7 +473,7 @@ namespace MyTypeRacer {
 			// 
 			// timer_CalcValues
 			// 
-			this->timer_CalcValues->Interval = 50;
+			this->timer_CalcValues->Interval = 1000;
 			this->timer_CalcValues->Tick += gcnew System::EventHandler(this, &Hauptfenster::timer_CalcValues_Tick);
 			// 
 			// menuStrip_Auswahl
@@ -502,21 +502,21 @@ namespace MyTypeRacer {
 			// tsmi_AddNewText
 			// 
 			this->tsmi_AddNewText->Name = L"tsmi_AddNewText";
-			this->tsmi_AddNewText->Size = System::Drawing::Size(166, 22);
+			this->tsmi_AddNewText->Size = System::Drawing::Size(167, 22);
 			this->tsmi_AddNewText->Text = L"Text Hinzufuegen";
 			this->tsmi_AddNewText->Click += gcnew System::EventHandler(this, &Hauptfenster::tsmi_AddNewText_Click);
 			// 
 			// tsmi_ShowHighscore
 			// 
 			this->tsmi_ShowHighscore->Name = L"tsmi_ShowHighscore";
-			this->tsmi_ShowHighscore->Size = System::Drawing::Size(166, 22);
+			this->tsmi_ShowHighscore->Size = System::Drawing::Size(167, 22);
 			this->tsmi_ShowHighscore->Text = L"Highscore";
 			this->tsmi_ShowHighscore->Click += gcnew System::EventHandler(this, &Hauptfenster::tsmi_ShowHighscore_Click);
 			// 
 			// tsmi_Exit
 			// 
 			this->tsmi_Exit->Name = L"tsmi_Exit";
-			this->tsmi_Exit->Size = System::Drawing::Size(166, 22);
+			this->tsmi_Exit->Size = System::Drawing::Size(167, 22);
 			this->tsmi_Exit->Text = L"Beenden";
 			this->tsmi_Exit->Click += gcnew System::EventHandler(this, &Hauptfenster::tsmi_Exit_Click);
 			// 
@@ -585,6 +585,9 @@ namespace MyTypeRacer {
 	private: System::Void timer_CalcValues_Tick(System::Object^ sender, System::EventArgs^ e);
 
 	private: System::Void textBox_Input_TextChanged(System::Object^ sender, System::EventArgs^ e);
+
+	private: System::Void textBox_Input_KeyPress(System::Object^ sender, System::Windows::Forms::KeyPressEventArgs^ e);
+
 		   //tsmi = toolStripMenuItem
 	private: System::Void tsmi_Exit_Click(System::Object^ sender, System::EventArgs^ e);
 
@@ -611,6 +614,6 @@ namespace MyTypeRacer {
 
 	private: System::Void addNewHighscore();
 
-	private: System::Void fillComboBox();	
-	};
+	private: System::Void fillComboBox();
+};
 }

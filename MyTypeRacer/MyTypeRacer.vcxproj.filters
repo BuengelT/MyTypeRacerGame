@@ -45,4 +45,9 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Database.mdf">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+  </ItemGroup>
 </Project>

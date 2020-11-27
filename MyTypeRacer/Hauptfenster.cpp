@@ -51,45 +51,20 @@ System::Void MyTypeRacer::Hauptfenster::timer_Countdown_Tick(System::Object^ sen
 
 System::Void MyTypeRacer::Hauptfenster::timer_CalcValues_Tick(System::Object^ sender, System::EventArgs^ e)
 {
-	this->ll_timerCalcValuesTickCounter++;
-	if (this->ll_timerCalcValuesTickCounter % 8 == 0)// 100 Millisekunden
-	{
-		//this->label_WPM->Text = Convert::ToString((int)(((float)this->wordProgress / (float)this->timerCalcValuesTickCounter) * 1000));
-		this->label_WPM->Text =
-			(
-			(
-				(this->int_keyStrokes / 5.0)
-				/
-				(float)this->ll_timerCalcValuesTickCounter
-				)
-				* 1000)
-			.ToString("0");
+	this->int_timeSpentSec++;
+	this->label_Time->Text = this->int_timeSpentSec.ToString();
 
+	//Berechnung der WPM
+	this->label_WPM->Text = ((this->int_keyStrokes / 5.0) / (this->int_timeSpentSec / 60.0)).ToString("0");
 
-		this->label_Errors->Text =
-			(
-			(
-				(float)(this->int_keyStrokes - this->int_Errors)
-				/
-				(float)this->int_keyStrokes
-				)
-				* 100)
-			.ToString("0.00");
-	}
-
-	if (this->ll_timerCalcValuesTickCounter % 16 == 0) // 1 sekunde
-	{
-		this->int_timeSpentSec++;
-		this->label_Time->Text = this->int_timeSpentSec.ToString();
-	}
+	this->label_Errors->Text = (((float)(this->int_keyStrokes - this->int_Errors) / (float)this->int_keyStrokes) * 100).ToString("0.00");
 }
 
 System::Void MyTypeRacer::Hauptfenster::textBox_Input_TextChanged(System::Object^ sender, System::EventArgs^ e)
 {
 	// pruefen ob die TextBoxInput dem currentWord entspricht
 	if (this->textBox_Input->Text == this->string_CurrentWord)
-	{
-		this->int_keyStrokes += array_CurrentText[int_wordProgress]->Length;
+	{		
 		// Wenn ein Wort voll ist, dann wird der counter inkrementiert
 		this->int_wordProgress++;
 		this->label_Words->Text = Convert::ToString(this->int_wordProgress);
@@ -160,6 +135,14 @@ System::Void MyTypeRacer::Hauptfenster::textBox_Input_TextChanged(System::Object
 		}
 		//Aendern der Hintergrundfabe von Input-Textbox in Rot
 		this->textBox_Input->BackColor = System::Drawing::Color::Red;
+	}
+}
+
+System::Void MyTypeRacer::Hauptfenster::textBox_Input_KeyPress(System::Object^ sender, System::Windows::Forms::KeyPressEventArgs^ e)
+{
+	//Tastenanschläge zählen, aber nur wenn keine Fehler vorliegt
+	if (Char::IsLetter(e->KeyChar) && !this->bool_ErrorBit) {
+		this->int_keyStrokes++;
 	}
 }
 
@@ -241,7 +224,6 @@ System::Void MyTypeRacer::Hauptfenster::initializeNewGame(InitText value)
 	this->int_wordProgress = 0;
 
 	// Initialisiere Timer Variables
-	this->ll_timerCalcValuesTickCounter = 0;
 	this->int_timeSpentSec = 0;
 
 	// Reset Countdown
@@ -273,7 +255,7 @@ System::Void MyTypeRacer::Hauptfenster::initializeNewGame(InitText value)
 	this->label_Time->Text = this->int_timeSpentSec.ToString();
 	this->label_Words->Text = this->int_wordProgress.ToString();
 	this->label_WPM->Text = "0";
-	this->label_Errors->Text = "";
+	this->label_Errors->Text = "0,00";
 
 	// Funktionaliteat zum Färben der Textboxen Initialisieren
 	manageRichTextBoxOneLine();
@@ -345,15 +327,12 @@ System::Void MyTypeRacer::Hauptfenster::manageRichTextBoxCurrentText()
 	// Auf Standard setzen um vorheriges Wort zu demaskieren
 	this->richTextBox_CurrentText->Text = this->string_CurrentText;
 
-	//this->richTextBox_CurrentText->Select(0, this->string_CurrentText->Length); //anfang und laenge des aktuellen wortes
-	//this->richTextBox_CurrentText->SelectionBackColor = this->richTextBox_CurrentText->BackColor;
-	///this->richTextBox_CurrentText->SelectionFont = this->richTextBox_CurrentText->Font;
-
+	// mit dem .Net 5.0 funktioert die Select-Funktion der rtb nicht korrekt
 	// das jeweilige Wort hervorheben
-	this->richTextBox_CurrentText->SelectionStart = this->int_keyStrokes + this->int_wordProgress;
-	this->richTextBox_CurrentText->Select(this->richTextBox_CurrentText->SelectionStart, this->array_CurrentText[this->int_wordProgress]->Length); //anfang und länge des aktuellen wortes	
-	this->richTextBox_CurrentText->ScrollToCaret();
-	this->richTextBox_CurrentText->SelectionBackColor = System::Drawing::Color::Yellow;
+	//this->richTextBox_CurrentText->SelectionStart = this->int_keyStrokes + this->int_wordProgress;	
+	//this->richTextBox_CurrentText->Select(this->richTextBox_CurrentText->SelectionStart, this->array_CurrentText[this->int_wordProgress]->Length); //anfang und länge des aktuellen wortes	
+	//this->richTextBox_CurrentText->ScrollToCaret();
+	//this->richTextBox_CurrentText->SelectionBackColor = System::Drawing::Color::Yellow;
 }
 
 System::Void MyTypeRacer::Hauptfenster::manageButtons(bool bStart, bool bStop, bool bReset)
@@ -430,7 +409,8 @@ System::Void MyTypeRacer::Hauptfenster::fillComboBox()
 }
 
 
-/*System::String^ MyTypeRacer::Hauptfenster::getCurrentText()
+/*Umgestellt auf DB
+System::String^ MyTypeRacer::Hauptfenster::getCurrentText()
 {
 	Random^ rand = gcnew Random();
 	array<String^>^ allTexts =
